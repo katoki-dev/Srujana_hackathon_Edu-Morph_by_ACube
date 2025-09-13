@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Classroom - EDU-MORPH</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        .gradient-text {
+            background: linear-gradient(135deg, #3B82F6 0%, #9333EA 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .feature-card {
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .glow-effect {
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
+        }
+        
+        .progress-bar {
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <div id="app">
+        <!-- Navigation Bar -->
+        <nav class="fixed top-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-sm border-b border-gray-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <!-- Logo -->
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-sm">EM</span>
+                        </div>
+                        <span class="text-xl font-bold gradient-text">EDU-MORPH</span>
+                    </div>
+                    
+                    <!-- User Menu -->
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center">
+                                <span class="text-white font-bold text-sm">{{ userInitials }}</span>
+                            </div>
+                            <span class="text-gray-300">{{ currentUser.name }}</span>
+                        </div>
+                        <button @click="logout" class="text-gray-300 hover:text-red-400 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="pt-16">
+            <!-- Welcome Section -->
+            <section class="bg-gradient-to-r from-purple-600 to-blue-700 py-12">
+                <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="text-center">
+                        <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">
+                            Welcome back, {{ currentUser.name }}! 👨‍🏫
+                        </h1>
+                        <p class="text-xl text-purple-100 mb-8">
+                            Ready to create amazing educational content? Let's make learning more engaging today.
+                        </p>
+                        
+                        <!-- Quick Stats -->
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
+                            <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                                <div class="text-3xl font-bold text-white mb-2">{{ totalStudents }}</div>
+                                <div class="text-purple-100">Total Students</div>
+                            </div>
+                            <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                                <div class="text-3xl font-bold text-white mb-2">{{ createdContent }}</div>
+                                <div class="text-purple-100">Content Created</div>
+                            </div>
+                            <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                                <div class="text-3xl font-bold text-white mb-2">{{ activeClasses }}</div>
+                                <div class="text-purple-100">Active Classes</div>
+                            </div>
+                            <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                                <div class="text-3xl font-bold text-white mb-2">{{ totalHours }}</div>
+                                <div class="text-purple-100">Teaching Hours</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Teacher Dashboard -->
+            <section class="py-12 bg-gray-800">
+                <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <h2 class="text-3xl font-bold gradient-text mb-8 text-center">Your Teaching Dashboard</h2>
+                    
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- AI Content Generator -->
+                        <div class="feature-card bg-gradient-to-br from-gray-700 to-gray-800 p-6 rounded-xl border border-gray-600 hover:border-blue-400">
+                            <div class="text-4xl mb-4">🤖</div>
+                            <h3 class="text-xl font-bold text-blue-400 mb-3">AI Content Generator</h3>
+                            <p class="text-gray-300 mb-4">Create lessons, quizzes, and flashcards with AI</p>
+                            <div class="space-y-2">
+                                <button @click="generateContent('lesson')" 
+                                        class="w-full p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                                    📝 Generate Lesson Notes
+                                </button>
+                                <button @click="generateContent('quiz')" 
+                                        class="w-full p-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors">
+                                    🧠 Create Quiz
+                                </button>
+                                <button @click="generateContent('flashcards')" 
+                                        class="w-full p-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
+                                    🗂️ Make Flashcards
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Class Management -->
+                        <div class="feature-card bg-gradient-to-br from-gray-700 to-gray-800 p-6 rounded-xl border border-gray-600 hover:border-purple-400">
+                            <div class="text-4xl mb-4">👥</div>
+                            <h3 class="text-xl font-bold text-purple-400 mb-3">Class Management</h3>
+                            <p class="text-gray-300 mb-4">Manage your classes and students</p>
+                            <div class="space-y-2">
+                                <div v-for="classItem in classes" :key="classItem.id" 
+                                     class="flex items-center justify-between p-3 bg-gray-600 rounded-lg">
+                                    <div>
+                                        <div class="text-white font-medium">{{ classItem.name }}</div>
+                                        <div class="text-gray-400 text-sm">{{ classItem.students }} students</div>
+                                    </div>
+                                    <button @click="manageClass(classItem)" 
+                                            class="px-3 py-1 bg-purple-500 text-white text-sm rounded hover:bg-purple-600 transition-colors">
+                                        Manage
+                                    </button>
+                                </div>
+                                <button @click="createNewClass" 
+                                        class="w-full p-2 border-2 border-dashed border-gray-500 text-gray-400 rounded-lg hover:border-purple-400 hover:text-purple-400 transition-colors">
+                                    + Create New Class
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Content Library -->
+                        <div class="feature-card bg-gradient-to-br from-gray-700 to-gray-800 p-6 rounded-xl border border-gray-600 hover:border-green-400">
+                            <div class="text-4xl mb-4">📚</div>
+                            <h3 class="text-xl font-bold text-green-400 mb-3">Content Library</h3>
+                            <p class="text-gray-300 mb-4">Your created educational materials</p>
+                            <div class="space-y-2">
+                                <div v-for="content in contentLibrary" :key="content.id" 
+                                     class="flex items-center justify-between p-3 bg-gray-600 rounded-lg">
+                                    <div>
+                                        <div class="text-white">{{ content.title }}</div>
+                                        <div class="text-gray-400 text-sm">{{ content.type }} • {{ content.date }}</div>
+                                    </div>
+                                    <button @click="editContent(content)" 
+                                            class="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-green-600 transition-colors">
+                                        Edit
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Student Analytics -->
+                        <div class="feature-card bg-gradient-to-br from-gray-700 to-gray-800 p-6 rounded-xl border border-gray-600 hover:border-yellow-400">
+                            <div class="text-4xl mb-4">📊</div>
+                            <h3 class="text-xl font-bold text-yellow-400 mb-3">Student Analytics</h3>
+                            <p class="text-gray-300 mb-4">Track student progress and performance</p>
+                            <div class="space-y-3">
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span class="text-gray-300">Class A - Math</span>
+                                        <span class="text-white">85% avg</span>
+                                    </div>
+                                    <div class="w-full bg-gray-600 rounded-full h-2">
+                                        <div class="progress-bar bg-yellow-400 h-2 rounded-full" style="width: 85%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span class="text-gray-300">Class B - Science</span>
+                                        <span class="text-white">92% avg</span>
+                                    </div>
+                                    <div class="w-full bg-gray-600 rounded-full h-2">
+                                        <div class="progress-bar bg-yellow-400 h-2 rounded-full" style="width: 92%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span class="text-gray-300">Class C - English</span>
+                                        <span class="text-white">78% avg</span>
+                                    </div>
+                                    <div class="w-full bg-gray-600 rounded-full h-2">
+                                        <div class="progress-bar bg-yellow-400 h-2 rounded-full" style="width: 78%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Activity -->
+                        <div class="feature-card bg-gradient-to-br from-gray-700 to-gray-800 p-6 rounded-xl border border-gray-600 hover:border-pink-400">
+                            <div class="text-4xl mb-4">⚡</div>
+                            <h3 class="text-xl font-bold text-pink-400 mb-3">Recent Activity</h3>
+                            <p class="text-gray-300 mb-4">Your latest teaching activities</p>
+                            <div class="space-y-2">
+                                <div v-for="activity in recentActivity" :key="activity.id" 
+                                     class="flex items-center space-x-3 p-2 bg-gray-600 rounded-lg">
+                                    <div class="text-lg">{{ activity.icon }}</div>
+                                    <div class="flex-1">
+                                        <div class="text-white text-sm">{{ activity.description }}</div>
+                                        <div class="text-gray-400 text-xs">{{ activity.time }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="feature-card bg-gradient-to-br from-gray-700 to-gray-800 p-6 rounded-xl border border-gray-600 hover:border-cyan-400">
+                            <div class="text-4xl mb-4">⚡</div>
+                            <h3 class="text-xl font-bold text-cyan-400 mb-3">Quick Actions</h3>
+                            <p class="text-gray-300 mb-4">Common teaching tasks</p>
+                            <div class="space-y-2">
+                                <button @click="quickAction('schedule')" 
+                                        class="w-full p-3 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-colors">
+                                    📅 Schedule Class
+                                </button>
+                                <button @click="quickAction('grade')" 
+                                        class="w-full p-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">
+                                    📝 Grade Assignments
+                                </button>
+                                <button @click="quickAction('announcement')" 
+                                        class="w-full p-3 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors">
+                                    📢 Send Announcement
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-gray-900 border-t border-gray-800 py-8">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <p class="text-gray-400">
+                        © 2025 EDU-MORPH | Empowering teachers with AI-driven tools
+                    </p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+        
+        createApp({
+            data() {
+                return {
+                    currentUser: null,
+                    totalStudents: 156,
+                    createdContent: 48,
+                    activeClasses: 6,
+                    totalHours: 240,
+                    classes: [
+                        { id: 1, name: 'Mathematics 101', students: 25 },
+                        { id: 2, name: 'Science Discovery', students: 22 },
+                        { id: 3, name: 'English Literature', students: 18 },
+                        { id: 4, name: 'History & Culture', students: 20 }
+                    ],
+                    contentLibrary: [
+                        { id: 1, title: 'Algebra Basics', type: 'Lesson', date: '2 days ago' },
+                        { id: 2, title: 'Photosynthesis Quiz', type: 'Quiz', date: '1 week ago' },
+                        { id: 3, title: 'Vocabulary Cards', type: 'Flashcards', date: '2 weeks ago' },
+                        { id: 4, title: 'World War II Notes', type: 'Lesson', date: '3 weeks ago' }
+                    ],
+                    recentActivity: [
+                        { id: 1, icon: '📝', description: 'Created new lesson on Algebra', time: '2 hours ago' },
+                        { id: 2, icon: '👥', description: 'Added 5 new students to Math 101', time: '1 day ago' },
+                        { id: 3, icon: '📊', description: 'Reviewed student progress reports', time: '2 days ago' },
+                        { id: 4, icon: '🧠', description: 'Generated quiz for Science class', time: '3 days ago' }
+                    ]
+                }
+            },
+            computed: {
+                userInitials() {
+                    if (!this.currentUser) return 'T';
+                    return this.currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase();
+                }
+            },
+            methods: {
+                generateContent(type) {
+                    const typeNames = {
+                        'lesson': 'Lesson Notes',
+                        'quiz': 'Quiz',
+                        'flashcards': 'Flashcards'
+                    };
+                    alert(`Generating ${typeNames[type]} with AI...`);
+                    // Here you would open the AI content generator modal/page
+                },
+                manageClass(classItem) {
+                    alert(`Managing class: ${classItem.name}`);
+                    // Here you would navigate to the class management page
+                },
+                createNewClass() {
+                    alert('Creating new class...');
+                    // Here you would open the create class modal
+                },
+                editContent(content) {
+                    alert(`Editing: ${content.title}`);
+                    // Here you would open the content editor
+                },
+                quickAction(action) {
+                    const actionNames = {
+                        'schedule': 'Schedule Class',
+                        'grade': 'Grade Assignments',
+                        'announcement': 'Send Announcement'
+                    };
+                    alert(`${actionNames[action]} feature coming soon!`);
+                },
+                logout() {
+                    localStorage.removeItem('currentUser');
+                    window.location.href = 'landing.html';
+                }
+            },
+            mounted() {
+                // Check if user is logged in
+                const currentUser = localStorage.getItem('currentUser');
+                if (!currentUser) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                this.currentUser = JSON.parse(currentUser);
+                
+                // Redirect if not a teacher
+                if (this.currentUser.role !== 'teacher') {
+                    window.location.href = 'student-classroom.html';
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

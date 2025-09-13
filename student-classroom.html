@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Classroom - EDU-MORPH</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        .gradient-text {
+            background: linear-gradient(135deg, #3B82F6 0%, #9333EA 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .feature-card {
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .glow-effect {
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
+        }
+        
+        .progress-bar {
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <div id="app">
+        <!-- Navigation Bar -->
+        <nav class="fixed top-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-sm border-b border-gray-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <!-- Logo -->
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-sm">EM</span>
+                        </div>
+                        <span class="text-xl font-bold gradient-text">EDU-MORPH</span>
+                    </div>
+                    
+                    <!-- User Menu -->
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 bg-gradient-to-br from-green-500 to-blue-600 rounded-full flex items-center justify-center">
+                                <span class="text-white font-bold text-sm">{{ userInitials }}</span>
+                            </div>
+                            <span class="text-gray-300">{{ currentUser.name }}</span>
+                        </div>
+                        <button @click="logout" class="text-gray-300 hover:text-red-400 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="pt-16">
+            <!-- Welcome Section -->
+            <section class="bg-gradient-to-r from-blue-600 to-purple-700 py-12">
+                <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="text-center">
+                        <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">
+                            Welcome back, {{ currentUser.name }}! 🎓
+                        </h1>
+                        <p class="text-xl text-blue-100 mb-8">
+                            Ready to continue your learning journey? Let's explore what's new today.
+                        </p>
+                        
+                        <!-- Quick Stats -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                            <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                                <div class="text-3xl font-bold text-white mb-2">{{ completedLessons }}</div>
+                                <div class="text-blue-100">Lessons Completed</div>
+                            </div>
+                            <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                                <div class="text-3xl font-bold text-white mb-2">{{ currentStreak }}</div>
+                                <div class="text-blue-100">Day Streak</div>
+                            </div>
+                            <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                                <div class="text-3xl font-bold text-white mb-2">{{ totalPoints }}</div>
+                                <div class="text-blue-100">Points Earned</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Learning Dashboard -->
+            <section class="py-12 bg-gray-800">
+                <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <h2 class="text-3xl font-bold gradient-text mb-8 text-center">Your Learning Dashboard</h2>
+                    
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Available Lessons -->
+                        <div class="feature-card bg-gradient-to-br from-gray-700 to-gray-800 p-6 rounded-xl border border-gray-600 hover:border-blue-400">
+                            <div class="text-4xl mb-4">📚</div>
+                            <h3 class="text-xl font-bold text-blue-400 mb-3">Available Lessons</h3>
+                            <p class="text-gray-300 mb-4">Explore new topics and expand your knowledge</p>
+                            <div class="space-y-2">
+                                <div v-for="lesson in availableLessons" :key="lesson.id" 
+                                     class="flex items-center justify-between p-3 bg-gray-600 rounded-lg">
+                                    <span class="text-white">{{ lesson.title }}</span>
+                                    <button @click="startLesson(lesson)" 
+                                            class="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition-colors">
+                                        Start
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quizzes -->
+                        <div class="feature-card bg-gradient-to-br from-gray-700 to-gray-800 p-6 rounded-xl border border-gray-600 hover:border-purple-400">
+                            <div class="text-4xl mb-4">🧠</div>
+                            <h3 class="text-xl font-bold text-purple-400 mb-3">Practice Quizzes</h3>
+                            <p class="text-gray-300 mb-4">Test your knowledge with interactive quizzes</p>
+                            <div class="space-y-2">
+                                <div v-for="quiz in availableQuizzes" :key="quiz.id" 
+                                     class="flex items-center justify-between p-3 bg-gray-600 rounded-lg">
+                                    <span class="text-white">{{ quiz.title }}</span>
+                                    <button @click="startQuiz(quiz)" 
+                                            class="px-3 py-1 bg-purple-500 text-white text-sm rounded hover:bg-purple-600 transition-colors">
+                                        Take Quiz
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Flashcards -->
+                        <div class="feature-card bg-gradient-to-br from-gray-700 to-gray-800 p-6 rounded-xl border border-gray-600 hover:border-green-400">
+                            <div class="text-4xl mb-4">🗂️</div>
+                            <h3 class="text-xl font-bold text-green-400 mb-3">Study Flashcards</h3>
+                            <p class="text-gray-300 mb-4">Review key concepts with spaced repetition</p>
+                            <div class="space-y-2">
+                                <div v-for="deck in flashcardDecks" :key="deck.id" 
+                                     class="flex items-center justify-between p-3 bg-gray-600 rounded-lg">
+                                    <span class="text-white">{{ deck.title }}</span>
+                                    <button @click="studyCards(deck)" 
+                                            class="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-green-600 transition-colors">
+                                        Study
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Progress Tracking -->
+                        <div class="feature-card bg-gradient-to-br from-gray-700 to-gray-800 p-6 rounded-xl border border-gray-600 hover:border-yellow-400">
+                            <div class="text-4xl mb-4">📊</div>
+                            <h3 class="text-xl font-bold text-yellow-400 mb-3">Your Progress</h3>
+                            <p class="text-gray-300 mb-4">Track your learning journey</p>
+                            <div class="space-y-3">
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span class="text-gray-300">Mathematics</span>
+                                        <span class="text-white">75%</span>
+                                    </div>
+                                    <div class="w-full bg-gray-600 rounded-full h-2">
+                                        <div class="progress-bar bg-yellow-400 h-2 rounded-full" style="width: 75%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span class="text-gray-300">Science</span>
+                                        <span class="text-white">60%</span>
+                                    </div>
+                                    <div class="w-full bg-gray-600 rounded-full h-2">
+                                        <div class="progress-bar bg-yellow-400 h-2 rounded-full" style="width: 60%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span class="text-gray-300">English</span>
+                                        <span class="text-white">90%</span>
+                                    </div>
+                                    <div class="w-full bg-gray-600 rounded-full h-2">
+                                        <div class="progress-bar bg-yellow-400 h-2 rounded-full" style="width: 90%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Activity -->
+                        <div class="feature-card bg-gradient-to-br from-gray-700 to-gray-800 p-6 rounded-xl border border-gray-600 hover:border-pink-400">
+                            <div class="text-4xl mb-4">⚡</div>
+                            <h3 class="text-xl font-bold text-pink-400 mb-3">Recent Activity</h3>
+                            <p class="text-gray-300 mb-4">Your latest learning activities</p>
+                            <div class="space-y-2">
+                                <div v-for="activity in recentActivity" :key="activity.id" 
+                                     class="flex items-center space-x-3 p-2 bg-gray-600 rounded-lg">
+                                    <div class="text-lg">{{ activity.icon }}</div>
+                                    <div class="flex-1">
+                                        <div class="text-white text-sm">{{ activity.description }}</div>
+                                        <div class="text-gray-400 text-xs">{{ activity.time }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Achievements -->
+                        <div class="feature-card bg-gradient-to-br from-gray-700 to-gray-800 p-6 rounded-xl border border-gray-600 hover:border-cyan-400">
+                            <div class="text-4xl mb-4">🏆</div>
+                            <h3 class="text-xl font-bold text-cyan-400 mb-3">Achievements</h3>
+                            <p class="text-gray-300 mb-4">Unlock badges and rewards</p>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div v-for="achievement in achievements" :key="achievement.id" 
+                                     :class="['p-3 rounded-lg text-center', achievement.unlocked ? 'bg-cyan-500/20 border border-cyan-500' : 'bg-gray-600']">
+                                    <div class="text-2xl mb-1">{{ achievement.icon }}</div>
+                                    <div class="text-xs text-white">{{ achievement.name }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-gray-900 border-t border-gray-800 py-8">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <p class="text-gray-400">
+                        © 2025 EDU-MORPH | Empowering students with AI-driven learning
+                    </p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+        
+        createApp({
+            data() {
+                return {
+                    currentUser: null,
+                    completedLessons: 12,
+                    currentStreak: 7,
+                    totalPoints: 1250,
+                    availableLessons: [
+                        { id: 1, title: 'Introduction to Algebra' },
+                        { id: 2, title: 'Photosynthesis Process' },
+                        { id: 3, title: 'World War II History' },
+                        { id: 4, title: 'Creative Writing Basics' }
+                    ],
+                    availableQuizzes: [
+                        { id: 1, title: 'Math Fundamentals' },
+                        { id: 2, title: 'Biology Quiz' },
+                        { id: 3, title: 'Literature Review' }
+                    ],
+                    flashcardDecks: [
+                        { id: 1, title: 'Vocabulary Builder' },
+                        { id: 2, title: 'Chemistry Formulas' },
+                        { id: 3, title: 'Historical Dates' }
+                    ],
+                    recentActivity: [
+                        { id: 1, icon: '📚', description: 'Completed Algebra Lesson', time: '2 hours ago' },
+                        { id: 2, icon: '🧠', description: 'Scored 85% on Math Quiz', time: '1 day ago' },
+                        { id: 3, icon: '🗂️', description: 'Studied 20 flashcards', time: '2 days ago' },
+                        { id: 4, icon: '🏆', description: 'Earned "Quick Learner" badge', time: '3 days ago' }
+                    ],
+                    achievements: [
+                        { id: 1, icon: '🎯', name: 'First Quiz', unlocked: true },
+                        { id: 2, icon: '🔥', name: '7 Day Streak', unlocked: true },
+                        { id: 3, icon: '📚', name: 'Bookworm', unlocked: true },
+                        { id: 4, icon: '🧠', name: 'Genius', unlocked: false },
+                        { id: 5, icon: '⭐', name: 'Perfect Score', unlocked: false },
+                        { id: 6, icon: '🏆', name: 'Champion', unlocked: false }
+                    ]
+                }
+            },
+            computed: {
+                userInitials() {
+                    if (!this.currentUser) return 'S';
+                    return this.currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase();
+                }
+            },
+            methods: {
+                startLesson(lesson) {
+                    alert(`Starting lesson: ${lesson.title}`);
+                    // Here you would navigate to the lesson page
+                },
+                startQuiz(quiz) {
+                    alert(`Starting quiz: ${quiz.title}`);
+                    // Here you would navigate to the quiz page
+                },
+                studyCards(deck) {
+                    alert(`Studying flashcards: ${deck.title}`);
+                    // Here you would navigate to the flashcard study page
+                },
+                logout() {
+                    localStorage.removeItem('currentUser');
+                    window.location.href = 'landing.html';
+                }
+            },
+            mounted() {
+                // Check if user is logged in
+                const currentUser = localStorage.getItem('currentUser');
+                if (!currentUser) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                this.currentUser = JSON.parse(currentUser);
+                
+                // Redirect if not a student
+                if (this.currentUser.role !== 'student') {
+                    window.location.href = 'teacher-classroom.html';
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
